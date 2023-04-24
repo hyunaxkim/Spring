@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="board">
+	<select id="list" parameterType="hashMap" resultType="com.spring.dto.BoardDTO"> <!-- resultType : 쿼리 결과의 형태 -->
+	select b.code, b.title, m.name as writer_name, b.view, b.reg_date
+	from board b
+	inner join member m on b.writer = m.code
+	where b.flag = 'Y'
+	<if test="searchType.equals('title')">
+		and b.title like concat('%', #{keyword}, '%')	
+	</if>
+	<if test="searchType.equals('content')">
+		and b.content like concat('%', #{keyword}, '%')	
+	</if>
+	<if test="searchType.equals('all')">
+		and ( b.title like concat('%', #{keyword}, '%')	
+				or b.content like concat('%', #{keyword}, '%') )
+	</if>
+	<if test="searchType.equals('writer_name')">
+		and m.name like concat('%', #{keyword}, '%')	
+	</if>
+	order by b.code desc
+	limit #{start}, #{limit}
+	</select>
+	
+	<select id="count" parameterType="hashMap" resultType="int">
+	select count(b.code)
+	from board b
+	inner join member m on b.writer = m.code
+	where b.flag = 'Y'
+	<if test="searchType.equals('title')">
+		and b.title like concat('%', #{keyword}, '%')	
+	</if>
+	<if test="searchType.equals('content')">
+		and b.content like concat('%', #{keyword}, '%')	
+	</if>
+	<if test="searchType.equals('all')">
+		and ( b.title like concat('%', #{keyword}, '%')	
+				or b.content like concat('%', #{keyword}, '%') )
+	</if>
+	<if test="searchType.equals('writer_name')">
+		and m.name like concat('%', #{keyword}, '%')	
+	</if>
+	</select>
+	
+	<insert id="create" parameterType="com.spring.dto.BoardDTO">
+	insert into board
+	(title, content, writer)
+	values
+	(#{title}, #{content}, #{writer})
+	</insert>
+	
+	<select id="detail" resultType="com.spring.dto.BoardDTO">
+	select b.code, b.title, b.content, m.name as writer_name, m.id as writer_id, b.writer, b.view, b.reg_date
+	from board b
+	inner join member m on b.writer = m.code
+	where b.code = #{code} and b.flag = 'Y'
+	</select>
+	
+	<update id="view" parameterType="int">
+	update board
+	set view = view + 1
+	where code = #{code}
+	</update>
+	
+	<update id="update" parameterType="com.spring.dto.BoardDTO">
+	update board
+	set title = #{title}, content = #{content}
+	where code = #{code}
+	</update>
+	
+	<update id="delete" parameterType="int">
+	update board
+	set flag = 'N'
+	where code = #{code}
+	</update>
+</mapper>

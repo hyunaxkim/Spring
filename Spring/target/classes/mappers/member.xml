@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="member">
+	<select id="login" resultType="Int">
+	select code
+	from member
+	where id=#{id} and pw=#{pw}
+	</select>
+	
+	<select id="idcheck" resultType="String">
+	select id
+	from member
+	where id=#{id}
+	</select>
+	
+	<!-- parameterType에는 쿼리에 들어가는 변수 타입을 적어줌 -->
+	<!-- useGeneratedKey가 true로 설정되면 쿼리 실행 후 생성된 PK를 파라미터 객체의 keyProperty 속성에 넣어줌 -->
+	<insert id="join" parameterType="string" useGeneratedKeys="true" keyProperty="code">
+	insert into member
+	(id, pw, name)
+	values
+	(#{id}, #{pw}, #{name})
+	</insert>
+	
+	<select id="info" resultType="com.spring.dto.MemberDTO">
+	select code, id, name, reg_date
+	from member
+	where code=#{code}
+	</select>
+</mapper>
